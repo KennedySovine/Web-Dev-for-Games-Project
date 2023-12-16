@@ -57,8 +57,8 @@ function create() {
   previewFruit.y = player.y + player.displayHeight / 2;
 
   // Create the sides and bottom of the box
-  let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
-  let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
+  let boxLeft = this.add.rectangle(381, 398, 20, 480, 0x000000, 0);
+  let boxRight = this.add.rectangle(820, 398, 20, 480, 0x000000, 0);
   let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
 
   // Enable physics for the sides and bottom
@@ -71,6 +71,10 @@ function create() {
   boxRight.body.allowGravity = false;
   boxBottom.body.setImmovable(true);
   boxBottom.body.allowGravity = false;
+
+  boxLeft.body.setBounce(0); // Make the box walls not bounce
+boxRight.body.setBounce(0);
+boxBottom.body.setBounce(0);
 
   fruits = this.physics.add.group();
 
