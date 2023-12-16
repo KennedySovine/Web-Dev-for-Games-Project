@@ -6,6 +6,8 @@ let previewFruit;
 let playerContainer;
 let nextFruit;
 let droppedFruits=[];
+let score = 0;
+let scoreNumber;
 
 function preload() {
   this.load.image('background', 'assets/background.png');
@@ -17,6 +19,15 @@ function preload() {
 
 function create() {
   background = this.add.image(600, 337.5, 'background');
+
+  let scoreContainer = this.add.container(180, 150);
+
+  let scoreText = this.add.text(115, 50, 'Score', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
+  scoreNumber = this.add.text(0, 0, '0', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
+  scoreNumber.setOrigin(0.5, 0.5);
+  scoreContainer.add(scoreNumber);
+
+  scoreNumber.setText(score);
 
   // Create container for player and preview
   playerContainer = this.add.container(400, 50);
@@ -84,6 +95,9 @@ function update() {
     playerContainer.x += 10; // move right
   }
 
+  //update Score
+  scoreNumber.setText(score);
+
   if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
     let currentX = playerContainer.x;
     let currentY = playerContainer.y;
@@ -102,6 +116,7 @@ function combineFruits(fruit1, fruit2) {
   // Check if the fruits are of the same type
   if (fruit1.texture.key === fruit2.texture.key) {
     // Combine the fruits into the next fruit
+    score += 50;
     let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
     // Create the combined fruit at the same position as the destroyed fruits
