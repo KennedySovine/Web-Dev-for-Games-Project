@@ -3,11 +3,7 @@ let fruits;
 let player;
 let cursors;
 let previewFruit;
-
-const fruitTypes = [
-  'cherry', 'strawberry', 'grape', 'orange', 'tangerine', 'apple',
-  'lemon', 'peach', 'pineapple', 'melon', 'watermelon'
-];
+let playerContainer;
 
 function preload() {
   this.load.image('background', 'assets/background.png');
@@ -21,20 +17,24 @@ function create() {
   background = this.add.image(600, 337.5, 'background');
 
   // Create container for player and preview
-  const playerContainer = this.add.container(400, 50);
+  playerContainer = this.add.container(400, 50);
 
   // Create player
-  player = createPlayer(this, 0, 0, 'player');
+  player = new Player(this, 0, 0, 'player');
   player.setScale(0.1);
   player.body.allowGravity = false;
 
-  // Add player to the container
-  playerContainer.add(player);
-
   // Create preview fruit
-  previewFruit = this.add.sprite(0, 0, 'cherry');
+  previewFruit = new Fruit(this, 0, 0, 'watermelon');
   previewFruit.setOrigin(0.5, 0.5);
-  previewFruit.setVisible(false);
+  previewFruit.setVisible(true);
+  previewFruit.body.allowGravity = false;
+
+  //Add to container
+  playerContainer.add(player);
+  playerContainer.add(previewFruit);
+  previewFruit.y = player.y + player.displayHeight / 2 ;
+  previewFruit.x = player.x - player.displayWidth / 2
 
   // Create a rectangular box in the middle
   const box = this.physics.add.sprite(600, 398);
@@ -68,36 +68,14 @@ function create() {
 }
 
 function update() {
-  updatePlayer(player, cursors);
-
-  if (cursors.left.isDown || cursors.right.isDown) {
-    previewFruit.setVisible(true);
-  } else {
-    previewFruit.setVisible(false);
+  if (cursors.left.isDown) {
+    playerContainer.x -= 10; // move left
+  } else if (cursors.right.isDown) {
+    playerContainer.x += 10; // move right
   }
 
   if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
     spawnFruits();
-  }
-}
-
-// Other functions (combineFruits, getCombinedFruitKey, isFruitInsideBox, spawnFruits) go here
-
-function createPlayer(scene, x, y, key) {
-  const player = scene.physics.add.sprite(x, y, key);
-  scene.physics.world.enable(player);
-  player.setBounce(0.2);
-  player.setCollideWorldBounds(true);
-  return player;
-}
-
-function updatePlayer(player, cursors) {
-  if (cursors.left.isDown) {
-    player.setVelocityX(-200); // Adjust the speed as needed
-  } else if (cursors.right.isDown) {
-    player.setVelocityX(200); // Adjust the speed as needed
-  } else {
-    player.setVelocityX(0);
   }
 }
 

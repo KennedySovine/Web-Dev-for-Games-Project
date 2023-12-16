@@ -9,29 +9,8 @@
 </head>
 <body>
   <script src="libs/phaser.js"></script>
-  <script src="js/entities/player.js"></script>
-  <script src="js/scenes/game.js"></script>
-
-  <script>
-    const config = {
-      type: Phaser.AUTO,
-    width: 1200,
-    height: 675,
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: { y: 100 },
-        debug: true,
-      },
-    },
-    scene: {
-      preload: preload,
-      create: create,
-      update: update,
-      },
-    };
-
-    const game = new Phaser.Game(config);
-  </script>
+  <script src="js/Player.js"></script>
+  <script src="js/fruit.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
