@@ -1,13 +1,37 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suika Game</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Phaser Game</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
   <script src="libs/phaser.js"></script>
-  <script src="game.js"></script>
+  <script src="js/entities/player.js"></script>
+  <script src="js/scenes/game.js"></script>
+
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+    width: 1200,
+    height: 675,
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { y: 100 },
+        debug: true,
+      },
+    },
+    scene: {
+      preload: preload,
+      create: create,
+      update: update,
+      },
+    };
+
+    const game = new Phaser.Game(config);
+  </script>
 </body>
 </html>
