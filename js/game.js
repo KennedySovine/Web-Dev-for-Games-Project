@@ -49,10 +49,9 @@ function create() {
   let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
   let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
   let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
-  let boxTop = this.add.rectangle(600, 157, 430, 10, 0x000000, 0);
 
   // Enable physics for the sides and bottom
-  this.physics.world.enable([boxLeft, boxRight, boxBottom, boxTop]);
+  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
 
   // Make the sides and bottom immovable
   boxLeft.body.setImmovable(true);
@@ -61,8 +60,6 @@ function create() {
   boxRight.body.allowGravity = false;
   boxBottom.body.setImmovable(true);
   boxBottom.body.allowGravity = false;
-  boxTop.body.setImmovable(true);
-  boxTop.body.allowGravity = false;
 
   fruits = this.physics.add.group();
 
@@ -71,11 +68,11 @@ function create() {
   this.physics.add.collider(fruits, boxRight);
   this.physics.add.collider(fruits, boxBottom);
 
+
   this.physics.world.removeCollider(playerContainer, boxLeft);
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
-  this.physics.overlap(fruits, boxTop, checkFruitBottom, null, this);
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
 }
@@ -95,66 +92,61 @@ function update() {
 
       // Create the fruit
       let dropFruit = new Fruit(this, currentX, currentY, previewFruit.texture.key);
-      console.log(dropFruit);
       fruits.add(dropFruit);
       droppedFruits.push(dropFruit);
       previewFruit.setTexture(nextFruit.texture.key);
       nextFruit.setTexture(getNextFruit());
+      console.log(dropFruit.y);
+      if (dropFruit.y < 130) {
+        console.log('Might end game');
+        this.time.delayedCall(2000, () => {
+          console.log(dropFruit.y);
+            if (dropFruit.y < 130) {
+              gameOn = false;
+              alert('Game Over! /n Your Score: ' + score);
+              console.log('Game Over!');
+            }
+          });
+        }
+      }
     }
   }
-}
 
-function combineFruits(fruit1, fruit2) {
-  // Check if the fruits are of the same type
-  if (fruit1.texture.key === fruit2.texture.key) {
-    // Combine the fruits into the next fruit
-    let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
+  function combineFruits(fruit1, fruit2) {
+    // Check if the fruits are of the same type
+    if (fruit1.texture.key === fruit2.texture.key) {
+      // Combine the fruits into the next fruit
+      let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
-    // Create the combined fruit at the same position as the destroyed fruits
-    let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
-    fruits.add(combinedFruit);
-    droppedFruits.push(combinedFruit);
+      // Create the combined fruit at the same position as the destroyed fruits
+      let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
+      fruits.add(combinedFruit);
+      droppedFruits.push(combinedFruit);
 
-    // Destroy the original fruits
-    fruit1.destroy();
-    fruit2.destroy();
+      // Destroy the original fruits
+      fruit1.destroy();
+      fruit2.destroy();
+    }
   }
-}
 
-function checkFruitBottom(fruit, boxTop) {
-  // Check if the fruit is touching the bottom
-  if (fruit.body.touching.down) {
-    console.log("touch");
-    // The fruit is touching the bottom of the box top
-    this.time.delayedCall(2000, function() {
-      // Check again after 2 seconds
-      if (fruit.body.touching.down) {
-        console.log("game over");ß
-        this.physics.pause();
-        gameOn = false;
-      }
-    }, [], this);
-  }
-}
-
-const config = {
-  type: Phaser.AUTO,
-  width: 1200,
-  height: 675,
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: {
-        y: 100
+  const config = {
+    type: Phaser.AUTO,
+    width: 1200,
+    height: 675,
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: {
+          y: 100
+        },
+        debug: true,
       },
-      debug: true,
     },
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update,
-  },
-};
+    scene: {
+      preload: preload,
+      create: create,
+      update: update,
+    },
+  };
 
-const game = new Phaser.Game(config);
+  const game = new Phaser.Game(config);
