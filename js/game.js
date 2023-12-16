@@ -6,7 +6,6 @@ let previewFruit;
 let playerContainer;
 let nextFruit;
 
-
 function preload() {
   this.load.image('background', 'assets/background.png');
   for (const fruitType of fruitTypes) {
@@ -26,6 +25,7 @@ function create() {
   player.setScale(0.1);
   player.body.allowGravity = false;
 
+  nextFruit = new Fruit(this, 0, 0, 'cherry');
   // Create preview fruit
   previewFruit = new Fruit(this, 0, 0, 'cherry');
   previewFruit.setOrigin(0.5, 0.5);
@@ -36,7 +36,6 @@ function create() {
   playerContainer.add(player);
   playerContainer.add(previewFruit);
   previewFruit.y = player.y + player.displayHeight / 2 ;
-  previewFruit.x = player.x - player.displayWidth / 2
 
   //Create nextFruit preview
 
@@ -78,7 +77,16 @@ function update() {
   }
 
   if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-    dropFruit();
+    let currentX = playerContainer.x;
+    let currentY = playerContainer.y;
+    let currentKey = previewFruit.texture.key;
+    console.log(currentKey);
+    console.log("test");
+
+    // Create the fruit
+    let dropFruit = new Fruit(this, currentX, currentY, 'cherry');
+    fruits.add(dropFruit);
+    previewFruit.setTexture('strawberry');
   }
 }
 
@@ -95,12 +103,6 @@ function combineFruits(fruit) {
     fruit.destroy();
     previewFruit.setVisible(false);
   }
-}
-
-function dropFruit(){
-  let droppedFruit = previewFruit;
-  droppedFruit.body.allowGravity = true;
-  fruits.add(droppedFruit);
 }
 
 function spawnFruits() {
