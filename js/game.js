@@ -5,7 +5,8 @@ let cursors;
 let previewFruit;
 let playerContainer;
 let nextFruit;
-let droppedFruits=[];
+let droppedFruits = [];
+let gameOn = true;
 
 function preload() {
   this.load.image('background', 'assets/background.png');
@@ -32,7 +33,7 @@ function create() {
   nextFruit.y = 180;
   nextFruit.setScale(.5);
   nextFruit.setVisible(true);
-  
+
   // Create preview fruit
   previewFruit = new Fruit(this, 0, 0, 'cherry');
   previewFruit.setOrigin(0.5, 0.5);
@@ -42,17 +43,16 @@ function create() {
   //Add to container
   playerContainer.add(player);
   playerContainer.add(previewFruit);
-  previewFruit.y = player.y + player.displayHeight / 2 ;
-
-  //Create nextFruit preview
+  previewFruit.y = player.y + player.displayHeight / 2;
 
   // Create the sides and bottom of the box
   let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
   let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
- let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
+  let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
+  let boxTop = this.add.rectangle(600, 157, 430, 10, 0x000000, 0);
 
   // Enable physics for the sides and bottom
-  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
+  this.physics.world.enable([boxLeft, boxRight, boxBottom, boxTop]);
 
   // Make the sides and bottom immovable
   boxLeft.body.setImmovable(true);
@@ -61,6 +61,8 @@ function create() {
   boxRight.body.allowGravity = false;
   boxBottom.body.setImmovable(true);
   boxBottom.body.allowGravity = false;
+  boxTop.body.setImmovable(true);
+  boxTop.body.allowGravity = false;
 
   fruits = this.physics.add.group();
 
@@ -73,28 +75,32 @@ function create() {
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
+  this.physics.overlap(fruits, boxTop, checkFruitBottom, null, this);
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
-  if (cursors.left.isDown) {
-    playerContainer.x -= 10; // move left
-  } else if (cursors.right.isDown) {
-    playerContainer.x += 10; // move right
-  }
+  if (gameOn) {
+    if (cursors.left.isDown) {
+      playerContainer.x -= 10; // move left
+    } else if (cursors.right.isDown) {
+      playerContainer.x += 10; // move right
+    }
 
-  if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-    let currentX = playerContainer.x;
-    let currentY = playerContainer.y;
 
-    // Create the fruit
-    let dropFruit = new Fruit(this, currentX, currentY, previewFruit.texture.key);
-    console.log(dropFruit);
-    fruits.add(dropFruit);
-    droppedFruits.push(dropFruit);
-    previewFruit.setTexture(nextFruit.texture.key);
-    nextFruit.setTexture(getNextFruit());
+    if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
+      let currentX = playerContainer.x;
+      let currentY = playerContainer.y;
+
+      // Create the fruit
+      let dropFruit = new Fruit(this, currentX, currentY, previewFruit.texture.key);
+      console.log(dropFruit);
+      fruits.add(dropFruit);
+      droppedFruits.push(dropFruit);
+      previewFruit.setTexture(nextFruit.texture.key);
+      nextFruit.setTexture(getNextFruit());
+    }
   }
 }
 
@@ -105,13 +111,29 @@ function combineFruits(fruit1, fruit2) {
     let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
     // Create the combined fruit at the same position as the destroyed fruits
-    let combinedFruit = new Fruit(this, fruit1.x , fruit1.y - 10, combinedFruitKey);
+    let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
     fruits.add(combinedFruit);
     droppedFruits.push(combinedFruit);
 
     // Destroy the original fruits
     fruit1.destroy();
     fruit2.destroy();
+  }
+}
+
+function checkFruitBottom(fruit, boxTop) {
+  // Check if the fruit is touching the bottom
+  if (fruit.body.touching.down) {
+    console.log("touch");
+    // The fruit is touching the bottom of the box top
+    this.time.delayedCall(2000, function() {
+      // Check again after 2 seconds
+      if (fruit.body.touching.down) {
+        console.log("game over");ß
+        this.physics.pause();
+        gameOn = false;
+      }
+    }, [], this);
   }
 }
 
@@ -122,7 +144,9 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 100 },
+      gravity: {
+        y: 100
+      },
       debug: true,
     },
   },
