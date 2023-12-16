@@ -8,7 +8,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
       super(scene, x, y, key);
       scene.physics.world.enable(this);
       this.setScale(this.setSize());
-      this.setBounce(0.2);
+      this.setBounce(.2);
       this.setCollideWorldBounds(true);
     }
 
@@ -33,11 +33,6 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
     
       // Return the combined fruit key or the original key if not found
       return combinations[fruitKey] || fruitKey;
-    }
-
-    getNextFruit(){
-      let nextFruitInt = Math.random() * 6;
-      return fruitTypes[nextFruitInt];
     }
 
     setSize(){
@@ -66,6 +61,11 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
           return 0.9;
     }
   }
+}
+
+function getNextFruit(){
+  let nextFruitInt = Math.random() * 6;
+  return fruitTypes[nextFruitInt];
 }
 
   window.Fruit = Fruit;
