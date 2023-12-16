@@ -25,7 +25,7 @@ function create() {
   player.body.allowGravity = false;
 
   // Create preview fruit
-  previewFruit = new Fruit(this, 0, 0, 'watermelon');
+  previewFruit = new Fruit(this, 0, 0, 'cherry');
   previewFruit.setOrigin(0.5, 0.5);
   previewFruit.setVisible(true);
   previewFruit.body.allowGravity = false;
@@ -36,33 +36,18 @@ function create() {
   previewFruit.y = player.y + player.displayHeight / 2 ;
   previewFruit.x = player.x - player.displayWidth / 2
 
-  // Create a rectangular box in the middle
-  const box = this.physics.add.sprite(600, 398);
-  box.setDisplaySize(430, 473);
-  box.body.allowGravity = false;
-
-  // Enable physics for the box
-  this.physics.world.enable(box);
-  box.body.setImmovable(true);
-
   fruits = this.physics.add.group();
 
+  createBox();
+
   // Set up collisions
-  this.physics.add.collider(fruits, fruits, combineFruits, null, this);
-  this.physics.add.collider(fruits, box, isFruitInsideBox, null, this);
+  this.physics.add.collider(fruits, boxLeft);
+  this.physics.add.collider(fruits, boxRight);
+  this.physics.add.collider(fruits, boxBottom);
 
-  // Collide with the sides and bottom of the box, but not the top
-  this.physics.add.collider(fruits, box, function (fruit) {
-    const topCollision = fruit.body.touching.up || fruit.body.blocked.up;
-
-    if (!topCollision) {
-      combineFruits(fruit);
-    }
-  });
-
-  this.input.keyboard.on('keydown-SPACE', function (event) {
-    spawnFruits();
-  });
+  this.physics.world.removeCollider(playerContainer, boxLeft);
+  this.physics.world.removeCollider(playerContainer, boxRight);
+  this.physics.world.removeCollider(playerContainer, boxBottom);
 
   cursors = this.input.keyboard.createCursorKeys();
 }
@@ -75,7 +60,7 @@ function update() {
   }
 
   if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-    spawnFruits();
+    dropFruit();
   }
 }
 
@@ -94,33 +79,28 @@ function combineFruits(fruit) {
   }
 }
 
-function getCombinedFruitKey(fruitKey) {
-  // Mapping of fruit combinations
-  const combinations = {
-    'cherry': 'strawberry',
-    'strawberry': 'grape',
-    'grape': 'orange',
-    'orange': 'tangerine',
-    'tangerine': 'apple',
-    'apple': 'lemon',
-    'lemon': 'peach',
-    'peach': 'pineapple',
-    'pineapple': 'melon',
-    'melon': 'watermelon',
-  };
-
-  // Return the combined fruit key or the original key if not found
-  return combinations[fruitKey] || fruitKey;
+function dropFruit(){
+  let droppedFruit= previewFruit;
+  droppedFruit.body.allowGravity = true;
+  fruits.add(droppedFruit);
 }
 
-function isFruitInsideBox(box, fruit) {
-  // Check if the fruit is inside the box
-  return (
-    fruit.x > box.x - box.displayWidth / 2 &&
-    fruit.x < box.x + box.displayWidth / 2 &&
-    fruit.y > box.y - box.displayHeight / 2 &&
-    fruit.y < box.y + box.displayHeight / 2
-  );
+function createBox(){
+// Create the sides and bottom of the box
+  let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
+  let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
+ let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
+
+  // Enable physics for the sides and bottom
+  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
+
+  // Make the sides and bottom immovable
+  boxLeft.body.setImmovable(true);
+  boxLeft.body.allowGravity = false;
+  boxRight.body.setImmovable(true);
+  boxRight.body.allowGravity = false;
+  boxBottom.body.setImmovable(true);
+  boxBottom.body.allowGravity = false;
 }
 
 function spawnFruits() {
@@ -130,12 +110,26 @@ function spawnFruits() {
   }
 }
 
-function createFruit(scene, x, y, key) {
-  const fruit = scene.physics.add.sprite(x, y, key);
-  scene.physics.world.enable(fruit);
-  fruit.setBounce(0.2);
-  fruit.setCollideWorldBounds(true);
-  return fruit;
+function createBox(){
+  // Create the left, right, and bottom sides of the box
+  let boxLeft = this.physics.add.sprite(box.x - box.width / 2, box.y, null);
+  let boxRight = this.physics.add.sprite(box.x + box.width / 2, box.y, null);
+  let boxBottom = this.physics.add.sprite(box.x, box.y + box.height / 2, null);
+
+  // Set the size of the sides
+    boxLeft.displayWidth = 1; // Make the left side very thin
+  boxRight.displayWidth = 1; // Make the right side very thin
+  boxBottom.displayHeight = 1; // Make the bottom side very thin
+
+  // Set the height of the sides
+  boxLeft.displayHeight = box.height;
+  boxRight.displayHeight = box.height;
+  boxBottom.displayWidth = box.width;
+
+  // Make the sides immovable
+  boxLeft.body.setImmovable(true);
+  boxRight.body.setImmovable(true);
+  boxBottom.body.setImmovable(true);
 }
 
 const config = {
