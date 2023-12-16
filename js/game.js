@@ -4,6 +4,8 @@ let player;
 let cursors;
 let previewFruit;
 let playerContainer;
+let nextFruit;
+
 
 function preload() {
   this.load.image('background', 'assets/background.png');
@@ -36,9 +38,25 @@ function create() {
   previewFruit.y = player.y + player.displayHeight / 2 ;
   previewFruit.x = player.x - player.displayWidth / 2
 
-  fruits = this.physics.add.group();
+  //Create nextFruit preview
 
-  createBox();
+  // Create the sides and bottom of the box
+  let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
+  let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
+ let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
+
+  // Enable physics for the sides and bottom
+  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
+
+  // Make the sides and bottom immovable
+  boxLeft.body.setImmovable(true);
+  boxLeft.body.allowGravity = false;
+  boxRight.body.setImmovable(true);
+  boxRight.body.allowGravity = false;
+  boxBottom.body.setImmovable(true);
+  boxBottom.body.allowGravity = false;
+
+  fruits = this.physics.add.group();
 
   // Set up collisions
   this.physics.add.collider(fruits, boxLeft);
@@ -80,27 +98,9 @@ function combineFruits(fruit) {
 }
 
 function dropFruit(){
-  let droppedFruit= previewFruit;
+  let droppedFruit = previewFruit;
   droppedFruit.body.allowGravity = true;
   fruits.add(droppedFruit);
-}
-
-function createBox(){
-// Create the sides and bottom of the box
-  let boxLeft = this.add.rectangle(385, 398, 10, 480, 0x000000, 0);
-  let boxRight = this.add.rectangle(815, 398, 10, 480, 0x000000, 0);
- let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
-
-  // Enable physics for the sides and bottom
-  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
-
-  // Make the sides and bottom immovable
-  boxLeft.body.setImmovable(true);
-  boxLeft.body.allowGravity = false;
-  boxRight.body.setImmovable(true);
-  boxRight.body.allowGravity = false;
-  boxBottom.body.setImmovable(true);
-  boxBottom.body.allowGravity = false;
 }
 
 function spawnFruits() {
@@ -110,27 +110,7 @@ function spawnFruits() {
   }
 }
 
-function createBox(){
-  // Create the left, right, and bottom sides of the box
-  let boxLeft = this.physics.add.sprite(box.x - box.width / 2, box.y, null);
-  let boxRight = this.physics.add.sprite(box.x + box.width / 2, box.y, null);
-  let boxBottom = this.physics.add.sprite(box.x, box.y + box.height / 2, null);
 
-  // Set the size of the sides
-    boxLeft.displayWidth = 1; // Make the left side very thin
-  boxRight.displayWidth = 1; // Make the right side very thin
-  boxBottom.displayHeight = 1; // Make the bottom side very thin
-
-  // Set the height of the sides
-  boxLeft.displayHeight = box.height;
-  boxRight.displayHeight = box.height;
-  boxBottom.displayWidth = box.width;
-
-  // Make the sides immovable
-  boxLeft.body.setImmovable(true);
-  boxRight.body.setImmovable(true);
-  boxBottom.body.setImmovable(true);
-}
 
 const config = {
   type: Phaser.AUTO,
