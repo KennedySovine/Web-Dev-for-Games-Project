@@ -5,6 +5,7 @@ let cursors;
 let previewFruit;
 let playerContainer;
 let nextFruit;
+let droppedFruits=[];
 
 function preload() {
   this.load.image('background', 'assets/background.png');
@@ -25,7 +26,13 @@ function create() {
   player.setScale(0.1);
   player.body.allowGravity = false;
 
-  nextFruit = new Fruit(this, 0, 0, 'cherry');
+  nextFruit = new Fruit(this, 0, 0, 'strawberry');
+  nextFruit.body.allowGravity = false;
+  nextFruit.x = 1015;
+  nextFruit.y = 180;
+  nextFruit.setScale(.5);
+  nextFruit.setVisible(true);
+  
   // Create preview fruit
   previewFruit = new Fruit(this, 0, 0, 'cherry');
   previewFruit.setOrigin(0.5, 0.5);
@@ -66,6 +73,7 @@ function create() {
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
+  this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
 }
 
@@ -79,40 +87,33 @@ function update() {
   if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
     let currentX = playerContainer.x;
     let currentY = playerContainer.y;
-    let currentKey = previewFruit.texture.key;
-    console.log(currentKey);
-    console.log("test");
 
     // Create the fruit
-    let dropFruit = new Fruit(this, currentX, currentY, 'cherry');
+    let dropFruit = new Fruit(this, currentX, currentY, previewFruit.texture.key);
+    console.log(dropFruit);
     fruits.add(dropFruit);
-    previewFruit.setTexture('strawberry');
+    droppedFruits.push(dropFruit);
+    previewFruit.setTexture(nextFruit.texture.key);
+    nextFruit.setTexture(getNextFruit());
   }
 }
 
-function combineFruits(fruit) {
-  // Check if there are enough fruits to combine
-  if (fruits.countActive(true) >= 2) {
-    // Combine two fruits into the next fruit
-    let combinedFruitKey = getCombinedFruitKey(fruit.texture.key);
+function combineFruits(fruit1, fruit2) {
+  // Check if the fruits are of the same type
+  if (fruit1.texture.key === fruit2.texture.key) {
+    // Combine the fruits into the next fruit
+    let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
     // Create the combined fruit at the same position as the destroyed fruits
-    let combinedFruit = fruits.create(fruit.x, fruit.y, combinedFruitKey);
-    combinedFruit.setBounce(0.2);
-    combinedFruit.setCollideWorldBounds(true);
-    fruit.destroy();
-    previewFruit.setVisible(false);
+    let combinedFruit = new Fruit(this, fruit1.x , fruit1.y - 10, combinedFruitKey);
+    fruits.add(combinedFruit);
+    droppedFruits.push(combinedFruit);
+
+    // Destroy the original fruits
+    fruit1.destroy();
+    fruit2.destroy();
   }
 }
-
-function spawnFruits() {
-  for (let i = 0; i < 5; i++) {
-    const randomFruitType = Phaser.Math.RND.pick(fruitTypes);
-    const fruit = createFruit(this, Phaser.Math.RND.between(100, 1100), 100, randomFruitType);
-  }
-}
-
-
 
 const config = {
   type: Phaser.AUTO,
