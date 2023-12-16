@@ -6,6 +6,8 @@ let previewFruit;
 let playerContainer;
 let nextFruit;
 let droppedFruits = [];
+let score = 0;
+let scoreNumber;
 let gameOn = true;
 
 function preload() {
@@ -18,6 +20,15 @@ function preload() {
 
 function create() {
   background = this.add.image(600, 337.5, 'background');
+
+  let scoreContainer = this.add.container(180, 150);
+
+  let scoreText = this.add.text(115, 50, 'Score', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
+  scoreNumber = this.add.text(0, 0, '0', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
+  scoreNumber.setOrigin(0.5, 0.5);
+  scoreContainer.add(scoreNumber);
+
+  scoreNumber.setText(score);
 
   // Create container for player and preview
   playerContainer = this.add.container(400, 50);
@@ -86,6 +97,9 @@ function update() {
     }
 
 
+  //update Score
+  scoreNumber.setText(score);
+
     if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
       let currentX = playerContainer.x;
       let currentY = playerContainer.y;
@@ -97,13 +111,13 @@ function update() {
       previewFruit.setTexture(nextFruit.texture.key);
       nextFruit.setTexture(getNextFruit());
       console.log(dropFruit.y);
-      if (dropFruit.y < 130) {
+      if (dropFruit.y < 180) {
         console.log('Might end game');
         this.time.delayedCall(2000, () => {
           console.log(dropFruit.y);
-            if (dropFruit.y < 130) {
+            if (dropFruit.y < 180) {
               gameOn = false;
-              alert('Game Over! /n Your Score: ' + score);
+              alert('Game Over! Your Score: ' + score);
               console.log('Game Over!');
             }
           });
@@ -116,6 +130,7 @@ function update() {
     // Check if the fruits are of the same type
     if (fruit1.texture.key === fruit2.texture.key) {
       // Combine the fruits into the next fruit
+    score += 50;
       let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
       // Create the combined fruit at the same position as the destroyed fruits
