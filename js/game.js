@@ -164,8 +164,6 @@ function dropFruit(scene) {
   }
 }
 
-
-
 function fruitAndBoxCollision(fruit) {
   // Left box collision
   if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxLeft.getBounds())) {
@@ -193,7 +191,7 @@ function combineFruits(fruit1, fruit2) {
     let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
     // Create the combined fruit at the same position as the destroyed fruits
-    let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
+    let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 20, combinedFruitKey);
     fruits.add(combinedFruit);
     droppedFruits.push(combinedFruit);
     this.popSound.play();
@@ -223,6 +221,5 @@ const config = {
     update: update,
   },
 };
-
 
 const game = new Phaser.Game(config);

@@ -1,6 +1,6 @@
 const fruitTypes = [
     'cherry', 'strawberry', 'grape', 'lemon', 'orange', 'apple',
-    'cantaloupe', 'peach', 'pineapple', 'melon', 'watermelon'
+    'canteloupe', 'peach', 'pineapple', 'melon', 'watermelon'
   ];
   
 class Fruit extends Phaser.Physics.Arcade.Sprite {
@@ -10,8 +10,9 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
       scene.physics.world.enable(this);
       this.setScale(this.setSize());
       this.setCollideWorldBounds(true);
-      this.body.setCircle(this.width/2, 2,  -2);
+      this.body.setCircle(this.width/1.98, 1.5,  -5);
       this.setFriction(0, 0);
+      this.body.maxVelocity.x = 0;
       this.body.maxVelocity.y = 300;
 
       this.setBounce(0.5, 1);
@@ -31,7 +32,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
           return 0.4;
         case 'apple':
           return 0.45;
-        case 'cantaloupe':
+        case 'canteloupe':
           return 0.5;
         case 'peach':
           return 0.55;
@@ -55,11 +56,11 @@ function getCombinedFruitKey(fruitKey) {
   const combinations = {
     'cherry': 'strawberry',
     'strawberry': 'grape',
-    'grape': 'orange',
-    'orange': 'tangerine',
-    'tangerine': 'apple',
-    'apple': 'lemon',
-    'lemon': 'peach',
+    'grape': 'lemon',
+    'lemon': 'orange',
+    'orange': 'apple',
+    'apple': 'canteloupe',
+    'canteloupe': 'peach',
     'peach': 'pineapple',
     'pineapple': 'melon',
     'melon': 'watermelon',
