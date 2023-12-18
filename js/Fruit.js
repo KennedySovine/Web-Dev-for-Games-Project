@@ -1,6 +1,6 @@
 const fruitTypes = [
-    'cherry', 'strawberry', 'grape', 'orange', 'tangerine', 'apple',
-    'lemon', 'peach', 'pineapple', 'melon', 'watermelon'
+    'cherry', 'strawberry', 'grape', 'lemon', 'orange', 'apple',
+    'cantaloupe', 'peach', 'pineapple', 'melon', 'watermelon'
   ];
   
 class Fruit extends Phaser.Physics.Arcade.Sprite {
@@ -24,13 +24,13 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
           return 0.25;
         case 'grape':
           return 0.3;
-        case 'orange':
+        case 'lemon':
           return 0.35;
-        case 'tangerine':
+        case 'orange':
           return 0.4;
         case 'apple':
           return 0.45;
-        case 'lemon':
+        case 'cantaloupe':
           return 0.5;
         case 'peach':
           return 0.55;

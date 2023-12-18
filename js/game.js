@@ -164,12 +164,12 @@ function fruitAndBoxCollision(fruit) {
   // Left box collision
   if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxLeft.getBounds())) {
     // If it is, move it slightly down and to the side
-    fruit.y += 1;
+    fruit.y -= 1;
     fruit.x -= fruit.body.velocity.x > 0 ? 1 : -1;
     //Right box collision
   } else if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxRight.getBounds())) {
     // If it is, move it slightly down and to the side
-    fruit.y += 1;
+    fruit.y -=1;
     fruit.x -= fruit.body.velocity.x > 0 ? -1 : 1;
   }
 }
