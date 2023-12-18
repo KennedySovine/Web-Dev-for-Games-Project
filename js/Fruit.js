@@ -10,7 +10,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
       scene.physics.world.enable(this);
       this.setScale(this.setSize());
       this.setCollideWorldBounds(true);
-      this.body.setCircle(this.width/2);
+      this.body.setCircle(this.width/2, 2,  -2);
       this.setFriction(0, 0);
 
       this.setBounce(0.5, 1);

@@ -114,8 +114,18 @@ boxBottom.body.setBounce(0);
   fruits = this.physics.add.group();
 
   // Set up collisions
-  this.physics.add.collider(fruits, boxLeft);
-  this.physics.add.collider(fruits, boxRight);
+  this.physics.add.collider(fruits, boxLeft, function(fruit, boxLeft) {
+    // Move the fruit away from the wall
+    console.log("Fruit at " +fruit.x+" being moved to the right");
+    fruit.x += 5;
+    console.log(fruit.x);
+  });
+  this.physics.add.collider(fruits, boxRight, function(fruit) {
+    // Move the fruit away from the wall
+    console.log("Fruit at " +fruit.x+" being moved to the left");
+    fruit.x -= 5;
+    console.log(fruit.x);
+  });
   this.physics.add.collider(fruits, boxBottom);
 
   //Remove colliders for player and box.
@@ -123,8 +133,20 @@ boxBottom.body.setBounce(0);
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
+  this.physics.add.collider(fruits, boxLeft, function(fruit, boxLeft) {
+    // Move the fruit away from the wall
+    console.log("Fruit at " +fruit.x+" being moved to the right");
+    fruit.x += 5;
+    console.log(fruit.x);
+  });
 
-
+  this.physics.add.collider(fruits, boxRight, function(fruit) {
+    // Move the fruit away from the wall
+    console.log("Fruit at " +fruit.x+" being moved to the left");
+    fruit.x -= 5;
+    console.log(fruit.x);
+  });
+ 
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
 }
@@ -160,6 +182,7 @@ function update() {
             gameOn = false;
             alert('Game Over! Your Score: ' + score);
             console.log('Game Over!');
+            backgroundMusic.stop();
           }
         });
       }
