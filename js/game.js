@@ -9,22 +9,53 @@ let droppedFruits = [];
 let score = 0;
 let scoreNumber;
 let gameOn = true;
+let backgroundMusic;
+let popSound;
 
 function preload() {
-  this.load.image('background', 'assets/background.png');
+  // ----- Visuals Loading -----
+  this.load.image('background', 'assets/images/background.png');
+  //Load all Fruit Images
   for (const fruitType of fruitTypes) {
-    this.load.image(fruitType, `assets/${fruitType}.png`);
+    this.load.image(fruitType, `assets/images/${fruitType}.png`);
   }
-  this.load.image('player', 'assets/player.png');
+  //Load Player Image
+  this.load.image('player', 'assets/images/player.png');
+
+  // ----- Audio Loading -----
+  this.load.audio('backgroundMusic', 'assets/audio/backgroundMusic.mp3');
+
+  this.load.audio('pop', 'assets/audio/popSound.mp3')
 }
 
 function create() {
+  // ----- Audio Creation -----
+  this.popSound = this.sound.add('pop');
+  this.backgroundMusic = this.sound.add('backgroundMusic');
+
+  //Constantly play the music
+  this.backgroundMusic.play({
+    loop: true // Loop the audio
+  });
+
+
+  //Background Creation
   background = this.add.image(600, 337.5, 'background');
 
   let scoreContainer = this.add.container(180, 150);
 
-  let scoreText = this.add.text(115, 50, 'Score', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
-  scoreNumber = this.add.text(0, 0, '0', { fontSize: '40px', fill: 'white', stroke: '#000000', strokeThickness: 4});
+  let scoreText = this.add.text(115, 50, 'Score', {
+    fontSize: '40px',
+    fill: 'white',
+    stroke: '#000000',
+    strokeThickness: 4
+  });
+  scoreNumber = this.add.text(0, 0, '0', {
+    fontSize: '40px',
+    fill: 'white',
+    stroke: '#000000',
+    strokeThickness: 4
+  });
   scoreNumber.setOrigin(0.5, 0.5);
   scoreContainer.add(scoreNumber);
 
@@ -73,8 +104,13 @@ function create() {
   boxBottom.body.allowGravity = false;
 
   boxLeft.body.setBounce(0); // Make the box walls not bounce
+<<<<<<< HEAD
 boxRight.body.setBounce(0);
 boxBottom.body.setBounce(0);
+=======
+  boxRight.body.setBounce(0);
+  boxBottom.body.setBounce(0);
+>>>>>>> main
 
   fruits = this.physics.add.group();
 
@@ -83,7 +119,7 @@ boxBottom.body.setBounce(0);
   this.physics.add.collider(fruits, boxRight);
   this.physics.add.collider(fruits, boxBottom);
 
-
+  //Remove colliders for player and box.
   this.physics.world.removeCollider(playerContainer, boxLeft);
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
@@ -101,8 +137,8 @@ function update() {
     }
 
 
-  //update Score
-  scoreNumber.setText(score);
+    //update Score
+    scoreNumber.setText(score);
 
     if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
       let currentX = playerContainer.x;
@@ -119,53 +155,59 @@ function update() {
         console.log('Might end game');
         this.time.delayedCall(2000, () => {
           console.log(dropFruit.y);
-            if (dropFruit.y < 180) {
-              gameOn = false;
-              alert('Game Over! Your Score: ' + score);
-              console.log('Game Over!');
-            }
-          });
-        }
+          if (dropFruit.y < 180) {
+            gameOn = false;
+            alert('Game Over! Your Score: ' + score);
+            console.log('Game Over!');
+          }
+        });
       }
     }
   }
+}
 
-  function combineFruits(fruit1, fruit2) {
-    // Check if the fruits are of the same type
-    if (fruit1.texture.key === fruit2.texture.key) {
-      // Combine the fruits into the next fruit
-    score += 50;
-      let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
-
-      // Create the combined fruit at the same position as the destroyed fruits
-      let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
-      fruits.add(combinedFruit);
-      droppedFruits.push(combinedFruit);
-
-      // Destroy the original fruits
-      fruit1.destroy();
-      fruit2.destroy();
-    }
+//Combines 2 fruits together if they are the same type of fruit.
+function combineFruits(fruit1, fruit2) {
+  // if either fruit is a watermelon, return as they cannot be combined.
+  if (fruit1.texture.key === 'watermelon' || fruit2.texture.key === 'watermelon') {
+    return;
   }
+  // Check if the fruits are of the same type
+  if (fruit1.texture.key === fruit2.texture.key) {
+    // Combine the fruits into the next fruit
+    score += 50;
+    let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
 
-  const config = {
-    type: Phaser.AUTO,
-    width: 1200,
-    height: 675,
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: {
-          y: 100
-        },
-        debug: true,
+    // Create the combined fruit at the same position as the destroyed fruits
+    let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 10, combinedFruitKey);
+    fruits.add(combinedFruit);
+    droppedFruits.push(combinedFruit);
+    this.popSound.play();
+
+    // Destroy the original fruits
+    fruit1.destroy();
+    fruit2.destroy();
+  }
+}
+
+const config = {
+  type: Phaser.AUTO,
+  width: 1200,
+  height: 675,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: {
+        y: 100
       },
+      debug: true,
     },
-    scene: {
-      preload: preload,
-      create: create,
-      update: update,
-    },
-  };
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update,
+  },
+};
 
-  const game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
