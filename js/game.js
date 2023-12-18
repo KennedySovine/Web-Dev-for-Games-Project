@@ -125,40 +125,46 @@ function update() {
       playerContainer.x += 10; // move right
     }
 
-
     //update Score
     scoreNumber.setText(score);
 
+    // Drop the fruit if the space bar is pressed.
     if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-      let currentX = playerContainer.x;
-      let currentY = playerContainer.y;
-
-      // Create the fruit
-      let dropFruit = new Fruit(this, currentX, currentY, previewFruit.texture.key);
-      fruits.add(dropFruit);
-      droppedFruits.push(dropFruit);
-      previewFruit.setTexture(nextFruit.texture.key);
-      nextFruit.setTexture(getNextFruit());
-      console.log(dropFruit.y);
-      if (dropFruit.y < 180) {
-        console.log('Might end game');
-        this.time.delayedCall(2000, () => {
-          console.log(dropFruit.y);
-          if (dropFruit.y < 180) {
-            gameOn = false;
-            alert('Game Over! Your Score: ' + score);
-            console.log('Game Over!');
-            backgroundMusic.stop();
-          }
-        });
-      }
+      dropFruit(this);
     }
   }
-
-
   //Fruit and Box Collision
   fruits.children.each(fruitAndBoxCollision, this);
 }
+
+//Drops the fruit from the player container to the game world.
+function dropFruit(scene) {
+  let currentX = previewFruit.x + playerContainer.x;
+  let currentY = previewFruit.y + playerContainer.y;
+
+  // Create the fruit
+  let fruit = new Fruit(scene, currentX, currentY, previewFruit.texture.key);
+  //fruit.body.velocity.y = maxVelocity;
+  fruits.add(fruit);
+  droppedFruits.push(fruit);
+  previewFruit.setTexture(nextFruit.texture.key);
+  nextFruit.setTexture(getNextFruit());
+  fruit.body.velocity.y = 100;
+  if (fruit.y < 180) {
+    console.log('Might end game');
+    scene.time.delayedCall(2000, () => {
+      console.log(fruit.y);
+      if (fruit.y < 180) {
+        gameOn = false;
+        alert('Game Over! Your Score: ' + score);
+        console.log('Game Over!');
+        backgroundMusic.stop();
+      }
+    });
+  }
+}
+
+
 
 function fruitAndBoxCollision(fruit) {
   // Left box collision
@@ -169,7 +175,7 @@ function fruitAndBoxCollision(fruit) {
     //Right box collision
   } else if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxRight.getBounds())) {
     // If it is, move it slightly down and to the side
-    fruit.y -=1;
+    fruit.y -= 1;
     fruit.x -= fruit.body.velocity.x > 0 ? -1 : 1;
   }
 }
