@@ -1,16 +1,19 @@
 let background;
-let fruits;
+let backgroundMusic;
+let popSound;
 let player;
 let cursors;
 let previewFruit;
 let playerContainer;
+let fruits;
 let nextFruit;
 let droppedFruits = [];
 let score = 0;
 let scoreNumber;
 let gameOn = true;
-let backgroundMusic;
-let popSound;
+let boxLeft;
+let boxRight;
+let boxBottom;
 
 function preload() {
   // ----- Visuals Loading -----
@@ -21,6 +24,11 @@ function preload() {
   }
   //Load Player Image
   this.load.image('player', 'assets/images/player.png');
+
+  //Load box images
+  this.load.image('boxLeft', 'assets/images/boxLeft.png');
+  this.load.image('boxRight', 'assets/images/boxRight.png');
+  this.load.image('boxBottom', 'assets/images/boxBottom.png');
 
   // ----- Audio Loading -----
   this.load.audio('backgroundMusic', 'assets/audio/backgroundMusic.mp3');
@@ -88,65 +96,23 @@ function create() {
   previewFruit.y = player.y + player.displayHeight / 2;
 
   // Create the sides and bottom of the box
-  let boxLeft = this.add.rectangle(381, 398, 20, 480, 0x000000, 0);
-  let boxRight = this.add.rectangle(820, 398, 20, 480, 0x000000, 0);
-  let boxBottom = this.add.rectangle(600, 637, 430, 10, 0x000000, 0);
+  this.boxLeft = this.physics.add.staticImage(381, 398, 'boxLeft');
+  this.boxRight = this.physics.add.staticImage(820, 398, 'boxRight');
+  this.boxBottom = this.physics.add.staticImage(600, 637, 'boxBottom');
 
   // Enable physics for the sides and bottom
-  this.physics.world.enable([boxLeft, boxRight, boxBottom]);
-
-  // Make the sides and bottom immovable
-  boxLeft.body.setImmovable(true);
-  boxLeft.body.allowGravity = false;
-  boxRight.body.setImmovable(true);
-  boxRight.body.allowGravity = false;
-  boxBottom.body.setImmovable(true);
-  boxBottom.body.allowGravity = false;
-
-  boxLeft.body.setBounce(0); // Make the box walls not bounce
-boxRight.body.setBounce(0);
-boxBottom.body.setBounce(0);
-
-  boxLeft.body.setBounce(0); // Make the box walls not bounce
-  boxRight.body.setBounce(0);
-  boxBottom.body.setBounce(0);
+  this.physics.world.enable([this.boxLeft, this.boxRight, this.boxBottom]);
 
   fruits = this.physics.add.group();
 
   // Set up collisions
-  this.physics.add.collider(fruits, boxLeft, function(fruit, boxLeft) {
-    // Move the fruit away from the wall
-    console.log("Fruit at " +fruit.x+" being moved to the right");
-    fruit.x += 5;
-    console.log(fruit.x);
-  });
-  this.physics.add.collider(fruits, boxRight, function(fruit) {
-    // Move the fruit away from the wall
-    console.log("Fruit at " +fruit.x+" being moved to the left");
-    fruit.x -= 5;
-    console.log(fruit.x);
-  });
-  this.physics.add.collider(fruits, boxBottom);
+  this.physics.add.collider(fruits, this.boxBottom);
 
   //Remove colliders for player and box.
   this.physics.world.removeCollider(playerContainer, boxLeft);
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
-  this.physics.add.collider(fruits, boxLeft, function(fruit, boxLeft) {
-    // Move the fruit away from the wall
-    console.log("Fruit at " +fruit.x+" being moved to the right");
-    fruit.x += 5;
-    console.log(fruit.x);
-  });
-
-  this.physics.add.collider(fruits, boxRight, function(fruit) {
-    // Move the fruit away from the wall
-    console.log("Fruit at " +fruit.x+" being moved to the left");
-    fruit.x -= 5;
-    console.log(fruit.x);
-  });
- 
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
 }
@@ -187,6 +153,24 @@ function update() {
         });
       }
     }
+  }
+
+
+  //Fruit and Box Collision
+  fruits.children.each(fruitAndBoxCollision, this);
+}
+
+function fruitAndBoxCollision(fruit) {
+  // Left box collision
+  if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxLeft.getBounds())) {
+    // If it is, move it slightly down and to the side
+    fruit.y += 1;
+    fruit.x -= fruit.body.velocity.x > 0 ? 1 : -1;
+    //Right box collision
+  } else if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxRight.getBounds())) {
+    // If it is, move it slightly down and to the side
+    fruit.y += 1;
+    fruit.x -= fruit.body.velocity.x > 0 ? -1 : 1;
   }
 }
 
@@ -233,5 +217,6 @@ const config = {
     update: update,
   },
 };
+
 
 const game = new Phaser.Game(config);
