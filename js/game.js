@@ -104,13 +104,12 @@ function create() {
   boxBottom.body.allowGravity = false;
 
   boxLeft.body.setBounce(0); // Make the box walls not bounce
-<<<<<<< HEAD
 boxRight.body.setBounce(0);
 boxBottom.body.setBounce(0);
-=======
+
+  boxLeft.body.setBounce(0); // Make the box walls not bounce
   boxRight.body.setBounce(0);
   boxBottom.body.setBounce(0);
->>>>>>> main
 
   fruits = this.physics.add.group();
 
@@ -123,6 +122,8 @@ boxBottom.body.setBounce(0);
   this.physics.world.removeCollider(playerContainer, boxLeft);
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
+
+
 
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   cursors = this.input.keyboard.createCursorKeys();
