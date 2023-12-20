@@ -132,15 +132,20 @@ function update() {
 
     // Drop the fruit if the space bar is pressed.
     if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-      reactivateFruit();
       dropFruit(this);
     }
   }
 
+  fruits.children.each(fruit => {
+    if (fruit.body.velocity.y < 5) {
+      fruit.body.velocity.y = 1;
+    }
+  });
+
   //touching2Fruits(fruit);
 
   //Checks if the fruit is touching either side of the box and another fruit.
-  let checkingFruit = function () {
+  /*let checkingFruit = function () {
     fruits.children.each(fruit => {
       // Check if the fruit is already immovable
       if (!fruit.body.immovable) {
@@ -159,7 +164,7 @@ function update() {
         }
       }
     });
-  }
+  }*/
 
   //Fruit and Box Collision
   fruits.children.each(fruitAndBoxCollision, this);
@@ -172,7 +177,7 @@ function reactivateFruit() {
   });
 }
 
-function touching2Fruits(fruit) {
+/*function touching2Fruits(fruit) {
   let overlapCount = 0;
   let touchingFruit = [];
 
@@ -195,10 +200,11 @@ function touching2Fruits(fruit) {
       fruit.body.setImmovable(true);
     });
   }
-}
+}*/
 
 //Drops the fruit from the player container to the game world.
 function dropFruit(scene) {
+
   let currentX = previewFruit.x + playerContainer.x;
   let currentY = previewFruit.y + playerContainer.y;
 
