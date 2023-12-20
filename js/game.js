@@ -142,30 +142,6 @@ function update() {
     }
   });
 
-  //touching2Fruits(fruit);
-
-  //Checks if the fruit is touching either side of the box and another fruit.
-  /*let checkingFruit = function () {
-    fruits.children.each(fruit => {
-      // Check if the fruit is already immovable
-      if (!fruit.body.immovable) {
-        let touchingBox = (this.physics.overlap(fruit, this.boxRight)) || (this.physics.overlap(fruit, this.boxLeft)); // If fruit is touching either side of the box
-        let touchingFruit = this.physics.overlap(fruit, fruits); //If the fruit is touching another fruit
-
-        //Set the fruit to be immovable if it is touching 2 fruits at the same time.
-        if (touchingBox && touchingFruit) {
-          console.log('Touching both')
-          fruit.body.y -= 1;
-          this.time.delayedCall(1000, () => {
-            if (touchingBox && touchingFruit) {
-              fruit.body.setImmovable(true);
-            }
-          });
-        }
-      }
-    });
-  }*/
-
   //Fruit and Box Collision
   fruits.children.each(fruitAndBoxCollision, this);
 }
@@ -176,31 +152,6 @@ function reactivateFruit() {
     fruit.body.setImmovable(false);
   });
 }
-
-/*function touching2Fruits(fruit) {
-  let overlapCount = 0;
-  let touchingFruit = [];
-
-  // Add the fruit to check
-  touchingFruit.push(fruit);
-
-  fruits.children.each(function (otherFruit) {
-    if (fruit === otherFruit) return; // Don't check a fruit against itself
-
-    if (this.physics.overlap(fruit, otherFruit)) {
-      overlapCount++;
-      // Add the fruit to the list of touching fruits
-      touchingFruit.push(otherFruit);
-    }
-  }, this);
-
-  if (overlapCount >= 2) {
-    console.log('Fruit is touching at least two other fruits');
-    touchingFruit.forEach(fruit => {
-      fruit.body.setImmovable(true);
-    });
-  }
-}*/
 
 //Drops the fruit from the player container to the game world.
 function dropFruit(scene) {
