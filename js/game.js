@@ -14,7 +14,8 @@ let gameOn = true;
 let boxLeft;
 let boxRight;
 let boxBottom;
-let velocitySpace = false;
+
+let fruitVelocity;
 
 function preload() {
   // ----- Visuals Loading -----
@@ -136,7 +137,9 @@ function update() {
     }
   }
 
-  /*touching2Fruits(fruit);
+  //touching2Fruits(fruit);
+
+  //Checks if the fruit is touching either side of the box and another fruit.
   let checkingFruit = function () {
     fruits.children.each(fruit => {
       // Check if the fruit is already immovable
@@ -156,7 +159,7 @@ function update() {
         }
       }
     });
-  }*/
+  }
 
   //Fruit and Box Collision
   fruits.children.each(fruitAndBoxCollision, this);
