@@ -17,6 +17,7 @@ let boxBottom;
 
 let fruitVelocity;
 
+//Preloads all of the images and audio files.
 function preload() {
   // ----- Visuals Loading -----
   this.load.image('background', 'assets/images/background.png');
@@ -38,6 +39,7 @@ function preload() {
   this.load.audio('pop', 'assets/audio/popSound.mp3')
 }
 
+//Creates all of the objects in the game.
 function create() {
   // ----- Audio Creation -----
   this.popSound = this.sound.add('pop');
@@ -52,8 +54,10 @@ function create() {
   //Background Creation
   background = this.add.image(600, 337.5, 'background');
 
+  //Create Score Container
   let scoreContainer = this.add.container(180, 150);
 
+  //Add Score Text
   let scoreText = this.add.text(115, 50, 'Score', {
     fontSize: '40px',
     fill: 'white',
@@ -71,7 +75,7 @@ function create() {
 
   scoreNumber.setText(score);
 
-  // Create container for player and preview
+  // Create container for player and next fruit
   playerContainer = this.add.container(400, 50);
 
   // Create player
@@ -79,6 +83,7 @@ function create() {
   player.setScale(0.1);
   player.body.allowGravity = false;
 
+  // Create next fruit display
   nextFruit = new Fruit(this, 0, 0, 'strawberry');
   nextFruit.body.allowGravity = false;
   nextFruit.x = 1015;
@@ -112,6 +117,7 @@ function create() {
   this.physics.world.removeCollider(playerContainer, boxRight);
   this.physics.world.removeCollider(playerContainer, boxBottom);
 
+  // Add physics colliders between the fruits
   this.physics.add.collider(fruits, fruits, combineFruits, null, this);
   this.physics.add.overlap(fruits, fruits, function (fruit1, fruit2) {
     if (fruit1.x < fruit2.x) {
@@ -126,7 +132,9 @@ function create() {
   cursors = this.input.keyboard.createCursorKeys();
 }
 
+//Updates the game every frame.
 function update() {
+  // Move the player left and right
   if (gameOn) {
     if (cursors.left.isDown) {
       playerContainer.x -= 10; // move left
@@ -134,7 +142,7 @@ function update() {
       playerContainer.x += 10; // move right
     }
 
-    //update Score
+    // Update Score
     scoreNumber.setText(score);
 
     // Drop the fruit if the space bar is pressed.
@@ -142,19 +150,6 @@ function update() {
       dropFruit(this);
     }
   }
-
-  /*fruits.children.each(fruit => {
-    if (fruit.body.velocity.y < 1) {
-      fruit.body.velocity.y = 0;
-    }
-    if (fruit.body.touching.down) {
-      fruit.body.velocity.y = 0;
-      fruit.body.setImmovable(true);
-    }
-    else {
-      fruit.body.setImmovable(false);
-    }
-  });*/
 
   //Fruit and Box Collision
   fruits.children.each(fruitAndBoxCollision, this);
@@ -167,10 +162,8 @@ function dropFruit(scene) {
     fruit.body.setImmovable(false);
     });
 
-
   let currentX = previewFruit.x + playerContainer.x;
   let currentY = previewFruit.y + playerContainer.y;
-
 
   // Create the fruit
   let fruit = new Fruit(scene, currentX, currentY, previewFruit.texture.key);
@@ -250,7 +243,7 @@ const config = {
       gravity: {
         y: 100
       },
-      debug: true,
+      debug: false,
     },
   },
   scene: {
