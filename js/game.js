@@ -16,6 +16,10 @@ let boxRight;
 let boxBottom;
 
 let fruitVelocity;
+const fruitTypes = [
+    'cherry', 'strawberry', 'grape', 'lemon', 'orange', 'apple',
+    'canteloupe', 'peach', 'pineapple', 'melon', 'watermelon'
+  ];
 
 //Preloads all of the images and audio files.
 function preload() {
