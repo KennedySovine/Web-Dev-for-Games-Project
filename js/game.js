@@ -238,8 +238,7 @@ const config = {
     matter: {
       gravity: {
         y: 0.8
-      },
-      debug: false,
+      }
     },
   },
   scene: {
