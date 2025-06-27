@@ -46,7 +46,7 @@ class Fruit extends Phaser.Physics.Matter.Sprite {
 }
 
 function getNextFruit(){
-  let nextFruitInt = Math.floor(Math.random() * 6);
+  let nextFruitInt = Math.floor(Math.random() * 5); // Only give the 5 smallest fruits
   return fruitTypes[nextFruitInt];
 }
 

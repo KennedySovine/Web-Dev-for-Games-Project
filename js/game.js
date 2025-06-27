@@ -184,13 +184,32 @@ function dropFruit(scene) {
 function combineFruits(fruit1, fruit2) {
   // if either fruit is a watermelon, return as they cannot be combined.
   if (fruit1.texture.key === 'watermelon' || fruit2.texture.key === 'watermelon') {
+    popSound.play();
+    fruit1.destroy();
+    fruit2.destroy();
     return;
   }
   // Check if the fruits are of the same type
   if (fruit1.texture.key === fruit2.texture.key) {
-    // Combine the fruits into the next fruit
-    score += 50;
+    // Get score based on fruit type
+    const fruitScores = {
+      'cherry': 2,
+      'strawberry': 4,
+      'grape': 6,
+      'lemon': 8,
+      'orange': 10,
+      'apple': 12,
+      'canteloupe': 14,
+      'peach': 16,
+      'pineapple': 18,
+      'melon': 20,
+      'watermelon': 22
+    };
+    
+    // Add the combined fruit's score
     let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
+    let scoreToAdd = fruitScores[combinedFruitKey] || 0;
+    score += scoreToAdd;
 
     // Create the combined fruit at the same position as the destroyed fruits
     let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 30, combinedFruitKey);
