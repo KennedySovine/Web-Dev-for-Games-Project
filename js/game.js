@@ -81,11 +81,11 @@ function create() {
   // Create player
   player = new Player(this, 0, 0, 'player');
   player.setScale(0.1);
-  player.body.allowGravity = false;
 
   // Create next fruit display
   nextFruit = new Fruit(this, 0, 0, 'strawberry');
-  nextFruit.body.allowGravity = false;
+  nextFruit.setStatic(true);
+  nextFruit.setIgnoreGravity(true);
   nextFruit.x = 1015;
   nextFruit.y = 180;
   nextFruit.setScale(.5);
@@ -95,7 +95,8 @@ function create() {
   previewFruit = new Fruit(this, 0, 0, 'cherry');
   previewFruit.setOrigin(0.5, 0.5);
   previewFruit.setVisible(true);
-  previewFruit.body.allowGravity = false;
+  previewFruit.setStatic(true);
+  previewFruit.setIgnoreGravity(true);
 
   //Add to container
   playerContainer.add(player);
@@ -103,31 +104,30 @@ function create() {
   previewFruit.y = player.y + player.displayHeight / 2;
 
   // Create the sides and bottom of the box
-  this.boxLeft = this.physics.add.staticImage(381, 398, 'boxLeft');
-  this.boxRight = this.physics.add.staticImage(820, 398, 'boxRight');
-  this.boxBottom = this.physics.add.staticImage(600, 637, 'boxBottom');
+  boxLeft = this.matter.add.image(381, 398, 'boxLeft', null, { isStatic: true });
+  boxRight = this.matter.add.image(820, 398, 'boxRight', null, { isStatic: true });
+  boxBottom = this.matter.add.image(600, 637, 'boxBottom', null, { isStatic: true });
 
-  // Enable physics for the sides and bottom
-  this.physics.world.enable([this.boxLeft, this.boxRight, this.boxBottom]);
+  // Create fruits group (we'll manage this manually with Matter.js)
+  fruits = [];
 
-  fruits = this.physics.add.group();
-
-  //Remove colliders for player and box.
-  this.physics.world.removeCollider(playerContainer, boxLeft);
-  this.physics.world.removeCollider(playerContainer, boxRight);
-  this.physics.world.removeCollider(playerContainer, boxBottom);
-
-  // Add physics colliders between the fruits
-  this.physics.add.collider(fruits, fruits, combineFruits, null, this);
-  this.physics.add.overlap(fruits, fruits, function (fruit1, fruit2) {
-    if (fruit1.x < fruit2.x) {
-      fruit1.x--;
-      fruit2.x++;
-    } else if (fruit1.x > fruit2.x) {
-      fruit1.x++;
-      fruit2.x--;
-    }
-  }, null, this);
+  // Set up collision detection for fruit combinations
+  this.matter.world.on('collisionstart', (event) => {
+    event.pairs.forEach((pair) => {
+      const { bodyA, bodyB } = pair;
+      if (bodyA.gameObject && bodyB.gameObject && 
+          bodyA.gameObject.texture && bodyB.gameObject.texture) {
+        const fruit1 = bodyA.gameObject;
+        const fruit2 = bodyB.gameObject;
+        // Combine if same type, regardless of array status
+        if (fruit1.texture.key === fruit2.texture.key && 
+            fruit1.texture.key !== 'watermelon' &&
+            fruit1.active && fruit2.active) {
+          combineFruits.call(this, fruit1, fruit2);
+        }
+      }
+    });
+  });
 
   cursors = this.input.keyboard.createCursorKeys();
 }
@@ -150,34 +150,27 @@ function update() {
       dropFruit(this);
     }
   }
-
-  //Fruit and Box Collision
-  fruits.children.each(fruitAndBoxCollision, this);
 }
 
 //Drops the fruit from the player container to the game world.
 function dropFruit(scene) {
-
-  fruits.children.each(fruit => {
-    fruit.body.setImmovable(false);
-    });
-
   let currentX = previewFruit.x + playerContainer.x;
   let currentY = previewFruit.y + playerContainer.y;
 
   // Create the fruit
   let fruit = new Fruit(scene, currentX, currentY, previewFruit.texture.key);
-  fruit.body.velocity.y = 100;
-  fruits.add(fruit);
+  fruit.setVelocity(0, 3); // Small initial downward velocity
+  fruits.push(fruit);
   droppedFruits.push(fruit);
+  
   previewFruit.setTexture(nextFruit.texture.key);
   nextFruit.setTexture(getNextFruit());
-  fruit.body.velocity.y = 100;
+  
   if (fruit.y < 180) {
     console.log('Might end game');
     scene.time.delayedCall(2000, () => {
-      console.log(fruit.y);
-      if (fruit.y < 180) {
+      // Check if fruit still exists and hasn't been destroyed
+      if (fruit.active && fruit.body && fruit.y < 180) {
         gameOn = false;
         alert('Game Over! Your Score: ' + score);
         console.log('Game Over!');
@@ -187,45 +180,48 @@ function dropFruit(scene) {
   }
 }
 
-function fruitAndBoxCollision(fruit) {
-  // Left box collision
-  if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxLeft.getBounds())) {
-    // If it is, move it slightly down and to the side
-    fruit.y -= 1;
-    fruit.x -= fruit.body.velocity.x > 0 ? 1 : -1;
-    //Right box collision
-  } else if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxRight.getBounds())) {
-    // If it is, move it slightly down and to the side
-    fruit.y -= 1;
-    fruit.x -= fruit.body.velocity.x > 0 ? -1 : 1;
-  }
-  //Bottom box collision
-  if (Phaser.Geom.Intersects.RectangleToRectangle(fruit.getBounds(), this.boxBottom.getBounds())) {
-    console.log('Bottom collision')
-    fruit.body.y -= 1;
-    fruit.body.velocity.y = 0;
-    fruit.body.maxVelocity.y = 0; 
-    fruit.body.setImmovable(true);
-  }
-}
-
 //Combines 2 fruits together if they are the same type of fruit.
 function combineFruits(fruit1, fruit2) {
   // if either fruit is a watermelon, return as they cannot be combined.
   if (fruit1.texture.key === 'watermelon' || fruit2.texture.key === 'watermelon') {
+    popSound.play();
+    fruit1.destroy();
+    fruit2.destroy();
     return;
   }
   // Check if the fruits are of the same type
   if (fruit1.texture.key === fruit2.texture.key) {
-    // Combine the fruits into the next fruit
-    score += 50;
+    // Get score based on fruit type
+    const fruitScores = {
+      'cherry': 2,
+      'strawberry': 4,
+      'grape': 6,
+      'lemon': 8,
+      'orange': 10,
+      'apple': 12,
+      'canteloupe': 14,
+      'peach': 16,
+      'pineapple': 18,
+      'melon': 20,
+      'watermelon': 22
+    };
+    
+    // Add the combined fruit's score
     let combinedFruitKey = getCombinedFruitKey(fruit1.texture.key);
+    let scoreToAdd = fruitScores[combinedFruitKey] || 0;
+    score += scoreToAdd;
 
     // Create the combined fruit at the same position as the destroyed fruits
     let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 30, combinedFruitKey);
-    fruits.add(combinedFruit);
+    fruits.push(combinedFruit);
     droppedFruits.push(combinedFruit);
     popSound.play();
+
+    // Remove the original fruits from the fruits array
+    const index1 = fruits.indexOf(fruit1);
+    const index2 = fruits.indexOf(fruit2);
+    if (index1 > -1) fruits.splice(index1, 1);
+    if (index2 > -1) fruits.splice(index2, 1);
 
     // Destroy the original fruits
     fruit1.destroy();
@@ -238,12 +234,12 @@ const config = {
   width: 1200,
   height: 675,
   physics: {
-    default: 'arcade',
-    arcade: {
+    default: 'matter',
+    matter: {
       gravity: {
-        y: 100
+        y: 0.8
       },
-      debug: false,
+      debug: true,
     },
   },
   scene: {

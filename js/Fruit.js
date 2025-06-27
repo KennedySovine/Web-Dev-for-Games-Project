@@ -3,19 +3,18 @@ const fruitTypes = [
     'canteloupe', 'peach', 'pineapple', 'melon', 'watermelon'
   ];
   
-class Fruit extends Phaser.Physics.Arcade.Sprite {
+class Fruit extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, key) {
-      super(scene, x, y, key);
+      super(scene.matter.world, x, y, key);
       scene.add.existing(this);
-      scene.physics.world.enable(this);
       this.setScale(this.setSize());
-      this.setCollideWorldBounds(true);
-      this.body.setCircle(this.width/1.98, 1.5,  -5);
-      this.setFriction(0, 0);
-      this.body.maxVelocity.x = 0;
-      this.body.maxVelocity.y = 300;
-
-      this.setBounce(0.5, 1);
+      
+      // Set circular physics body based on the scaled size
+      const scaledRadius = (this.width * this.scaleX) * 0.45; // Increased from 0.35 to reduce overlap
+      this.setCircle(scaledRadius);
+      this.setBounce(0.3);
+      this.setFriction(0.1);
+      this.setFrictionAir(0.01);
     }
 
     setSize(){
@@ -47,7 +46,7 @@ class Fruit extends Phaser.Physics.Arcade.Sprite {
 }
 
 function getNextFruit(){
-  let nextFruitInt = Math.floor(Math.random() * 6);
+  let nextFruitInt = Math.floor(Math.random() * 5); // Only give the 5 smallest fruits
   return fruitTypes[nextFruitInt];
 }
 
