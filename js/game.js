@@ -113,43 +113,13 @@ function create() {
 
   // Set up collision detection for fruit combinations
   this.matter.world.on('collisionstart', (event) => {
-    console.log('Collision start detected, pairs:', event.pairs.length);
-    event.pairs.forEach((pair) => {
-      const { bodyA, bodyB } = pair;
-      console.log('Bodies:', bodyA.label, bodyB.label);
-      if (bodyA.gameObject && bodyB.gameObject) {
-        console.log('Game objects found');
-        if (bodyA.gameObject.texture && bodyB.gameObject.texture) {
-          const fruit1 = bodyA.gameObject;
-          const fruit2 = bodyB.gameObject;
-          console.log(`Objects: ${fruit1.texture.key} and ${fruit2.texture.key}`);
-          console.log('Fruits array includes:', fruits.includes(fruit1), fruits.includes(fruit2));
-          if (fruits.includes(fruit1) && fruits.includes(fruit2)) {
-            //Debug to check what fruits are colliding
-            console.log(`Collision detected between ${fruit1.texture.key} and ${fruit2.texture.key}`);
-            // Add a small delay to ensure physics have settled
-            this.time.delayedCall(100, () => {
-              if (fruit1.active && fruit2.active) {
-                combineFruits.call(this, fruit1, fruit2);
-              }
-            });
-          }
-        }
-      }
-    });
-  });
-
-  // Also check for ongoing collisions
-  this.matter.world.on('collisionactive', (event) => {
     event.pairs.forEach((pair) => {
       const { bodyA, bodyB } = pair;
       if (bodyA.gameObject && bodyB.gameObject && 
           bodyA.gameObject.texture && bodyB.gameObject.texture) {
         const fruit1 = bodyA.gameObject;
         const fruit2 = bodyB.gameObject;
-        if (fruits.includes(fruit1) && fruits.includes(fruit2) &&
-            fruit1.texture.key === fruit2.texture.key &&
-            fruit1.texture.key !== 'watermelon') {
+        if (fruits.includes(fruit1) && fruits.includes(fruit2)) {
           combineFruits.call(this, fruit1, fruit2);
         }
       }
@@ -196,8 +166,8 @@ function dropFruit(scene) {
   if (fruit.y < 180) {
     console.log('Might end game');
     scene.time.delayedCall(2000, () => {
-      // Check if fruit still exists and hasn't been destroyed
-      if (fruit.active && fruit.body && fruit.y < 180) {
+      console.log(fruit.y);
+      if (fruit.y < 180) {
         gameOn = false;
         alert('Game Over! Your Score: ' + score);
         console.log('Game Over!');
@@ -247,7 +217,7 @@ const config = {
       gravity: {
         y: 0.8
       },
-      debug: true,
+      debug: false,
     },
   },
   scene: {
