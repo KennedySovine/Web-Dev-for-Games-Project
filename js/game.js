@@ -119,7 +119,10 @@ function create() {
           bodyA.gameObject.texture && bodyB.gameObject.texture) {
         const fruit1 = bodyA.gameObject;
         const fruit2 = bodyB.gameObject;
-        if (fruits.includes(fruit1) && fruits.includes(fruit2)) {
+        // Combine if same type, regardless of array status
+        if (fruit1.texture.key === fruit2.texture.key && 
+            fruit1.texture.key !== 'watermelon' &&
+            fruit1.active && fruit2.active) {
           combineFruits.call(this, fruit1, fruit2);
         }
       }
@@ -166,8 +169,8 @@ function dropFruit(scene) {
   if (fruit.y < 180) {
     console.log('Might end game');
     scene.time.delayedCall(2000, () => {
-      console.log(fruit.y);
-      if (fruit.y < 180) {
+      // Check if fruit still exists and hasn't been destroyed
+      if (fruit.active && fruit.body && fruit.y < 180) {
         gameOn = false;
         alert('Game Over! Your Score: ' + score);
         console.log('Game Over!');
@@ -217,7 +220,7 @@ const config = {
       gravity: {
         y: 0.8
       },
-      debug: false,
+      debug: true,
     },
   },
   scene: {
