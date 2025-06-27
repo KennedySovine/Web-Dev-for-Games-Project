@@ -16,10 +16,6 @@ let boxRight;
 let boxBottom;
 
 let fruitVelocity;
-const fruitTypes = [
-    'cherry', 'strawberry', 'grape', 'lemon', 'orange', 'apple',
-    'canteloupe', 'peach', 'pineapple', 'melon', 'watermelon'
-  ];
 
 //Preloads all of the images and audio files.
 function preload() {
@@ -46,11 +42,11 @@ function preload() {
 //Creates all of the objects in the game.
 function create() {
   // ----- Audio Creation -----
-  this.popSound = this.sound.add('pop');
-  this.backgroundMusic = this.sound.add('backgroundMusic');
+  popSound = this.sound.add('pop');
+  backgroundMusic = this.sound.add('backgroundMusic');
 
   //Constantly play the music
-  this.backgroundMusic.play({
+  backgroundMusic.play({
     loop: true // Loop the audio
   });
 
@@ -140,9 +136,9 @@ function create() {
 function update() {
   // Move the player left and right
   if (gameOn) {
-    if (cursors.left.isDown) {
+    if (cursors.left.isDown && playerContainer.x > 420) {
       playerContainer.x -= 10; // move left
-    } else if (cursors.right.isDown) {
+    } else if (cursors.right.isDown && playerContainer.x < 780) {
       playerContainer.x += 10; // move right
     }
 
@@ -229,7 +225,7 @@ function combineFruits(fruit1, fruit2) {
     let combinedFruit = new Fruit(this, fruit1.x, fruit1.y - 30, combinedFruitKey);
     fruits.add(combinedFruit);
     droppedFruits.push(combinedFruit);
-    this.popSound.play();
+    popSound.play();
 
     // Destroy the original fruits
     fruit1.destroy();

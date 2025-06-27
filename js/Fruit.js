@@ -71,3 +71,6 @@ function getCombinedFruitKey(fruitKey) {
 }
 
 window.Fruit = Fruit;
+window.fruitTypes = fruitTypes;
+window.getNextFruit = getNextFruit;
+window.getCombinedFruitKey = getCombinedFruitKey;
