@@ -1,10 +1,9 @@
-class Player extends Phaser.Physics.Arcade.Sprite {
+class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture) {
-      super(scene, x, y, texture);
-      scene.physics.add.existing(this);
-      scene.physics.world.enable(this);
-      this.body.allowGravity = false;
-      this.setCollideWorldBounds(true);
+      super(scene.matter.world, x, y, texture);
+      scene.add.existing(this);
+      this.setStatic(true); // Player doesn't fall
+      this.setIgnoreGravity(true);
     }
   }
 
